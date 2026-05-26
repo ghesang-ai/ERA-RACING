@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ERA-RACING Admin</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: #0F172A;
+      color: #F1F5F9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo { font-size: 32px; margin-bottom: 8px; }
+    h1 { font-size: 20px; font-weight: 800; color: #00D4AA; }
+    .sub { font-size: 12px; color: #64748B; margin-top: 4px; }
+
+    .card {
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 20px;
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+
+    /* PIN */
+    #pin-screen { text-align: center; }
+    .pin-input {
+      width: 140px;
+      background: #0F172A;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 24px;
+      color: #F1F5F9;
+      text-align: center;
+      letter-spacing: 8px;
+      font-family: monospace;
+      outline: none;
+      margin-bottom: 12px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .pin-input:focus { border-color: #00D4AA; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary { background: linear-gradient(135deg, #00D4AA, #0EA5E9); color: #0F172A; }
+    .btn-danger  { background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3); color: #EF4444; }
+    .btn-back    { background: rgba(100,116,139,.1); border: 1px solid #334155; color: #94A3B8; margin-top: 8px; }
+
+    /* Upload */
+    .drop-zone {
+      border: 2px dashed #334155;
+      border-radius: 10px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 12px;
+    }
+
+    .drop-zone.dragover {
+      border-color: #00D4AA;
+      background: rgba(0,212,170,.05);
+    }
+
+    .drop-icon { font-size: 36px; margin-bottom: 10px; }
+    .drop-text { font-size: 13px; color: #94A3B8; }
+    .drop-sub  { font-size: 11px; color: #64748B; margin-top: 4px; }
+
+    #file-input { display: none; }
+
+    .status-msg {
+      font-size: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .status-msg.success { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.3); color: #10B981; }
+    .status-msg.error   { background: rgba(239,68,68,.1);  border: 1px solid rgba(239,68,68,.3);  color: #EF4444; }
+    .status-msg.info    { background: rgba(14,165,233,.1); border: 1px solid rgba(14,165,233,.3); color: #0EA5E9; }
+
+    /* Settings */
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748B; margin-bottom: 6px; }
+    .field input {
+      width: 100%;
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #F1F5F9;
+      font-family: inherit;
+      outline: none;
+    }
+    .field input:focus { border-color: #00D4AA; }
+    .field .hint { font-size: 10px; color: #64748B; margin-top: 4px; }
+
+    #admin-content { display: none; width: 100%; max-width: 420px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🏁</div>
+  <h1>ERA-RACING Admin</h1>
+  <div class="sub">Update data & konfigurasi API</div>
+</div>
+
+<!-- PIN Screen -->
+<div class="card" id="pin-screen">
+  <div class="card-title">Masukkan PIN Admin</div>
+  <input type="password" class="pin-input" id="pin-input" maxlength="4"
+         placeholder="••••" inputmode="numeric">
+  <div class="status-msg" id="pin-error">PIN salah. Coba lagi.</div>
+  <button class="btn btn-primary" onclick="checkPin()">Masuk</button>
+</div>
+
+<!-- Admin Content -->
+<div id="admin-content">
+
+  <!-- Upload Excel -->
+  <div class="card">
+    <div class="card-title">📂 Upload File Excel</div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="drop-icon">📊</div>
+      <div class="drop-text">Drag & drop atau klik untuk pilih file</div>
+      <div class="drop-sub">Format: .xlsx | Max: 10MB</div>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.xls">
+    <div class="status-msg" id="upload-status"></div>
+  </div>
+
+  <!-- API Keys -->
+  <div class="card">
+    <div class="card-title">🔑 API Keys</div>
+
+    <div class="field">
+      <label>Anthropic API Key (AI Insight)</label>
+      <input type="password" id="field-anthropic" placeholder="sk-ant-...">
+      <div class="hint">Dari console.anthropic.com</div>
+    </div>
+
+    <div class="field">
+      <label>Fonnte Token (WhatsApp)</label>
+      <input type="password" id="field-fonnte" placeholder="Token Fonnte">
+      <div class="hint">Dari app.fonnte.com → Device</div>
+    </div>
+
+    <div class="field">
+      <label>Target WA (nomor / grup ID)</label>
+      <input type="text" id="field-wa-target" placeholder="628123456789 atau ID Grup">
+      <div class="hint">Format: 628xxx (tanpa + atau spasi)</div>
+    </div>
+
+    <div class="field">
+      <label>PIN Admin (4 digit)</label>
+      <input type="password" id="field-pin" placeholder="Ubah PIN" maxlength="4" inputmode="numeric">
+    </div>
+
+    <button class="btn btn-primary" onclick="saveSettings()" style="margin-bottom:8px">💾 Simpan Pengaturan</button>
+    <div class="status-msg" id="settings-status"></div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="card">
+    <div class="card-title">⚠️ Danger Zone</div>
+    <button class="btn btn-danger" onclick="clearAllData()" style="margin-bottom:8px">🗑️ Hapus Semua Data Cache</button>
+    <button class="btn btn-back" onclick="window.location='index.html'">← Kembali ke Dashboard</button>
+  </div>
+
+</div><!-- admin-content -->
+
+<script>
+  const STORED_PIN_KEY = 'era_admin_pin';
+
+  function getAdminPin() {
+    return localStorage.getItem(STORED_PIN_KEY) || '1234';
+  }
+
+  function checkPin() {
+    const val = document.getElementById('pin-input').value;
+    if (val === getAdminPin()) {
+      document.getElementById('pin-screen').style.display = 'none';
+      document.getElementById('admin-content').style.display = 'block';
+      loadSettings();
+    } else {
+      const err = document.getElementById('pin-error');
+      err.style.display = 'block';
+      err.className = 'status-msg error';
+      document.getElementById('pin-input').value = '';
+    }
+  }
+
+  document.getElementById('pin-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkPin();
+  });
+
+  // ── File Upload ────────────────────────
+  const dropZone = document.getElementById('drop-zone');
+
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  });
+
+  document.getElementById('file-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) processFile(file);
+  });
+
+  function processFile(file) {
+    if (!file.name.match(/\.xlsx?$/i)) {
+      showMsg('upload-status', 'error', '⚠️ File harus berformat .xlsx');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      showMsg('upload-status', 'error', '⚠️ File terlalu besar (maks 10MB)');
+      return;
+    }
+
+    showMsg('upload-status', 'info', '⏳ Membaca file...');
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: 'array' });
+
+        const sheets = wb.SheetNames;
+        const hasOppo = sheets.includes('OPPO CLIMBER');
+
+        if (!hasOppo) {
+          showMsg('upload-status', 'error', `⚠️ Sheet "OPPO CLIMBER" tidak ditemukan. Sheet tersedia: ${sheets.join(', ')}`);
+          return;
+        }
+
+        // Simpan sebagai base64 di localStorage
+        const binary = data.reduce((acc, b) => acc + String.fromCharCode(b), '');
+        const b64 = btoa(binary);
+        localStorage.setItem('era_racing_xlsx', b64);
+        localStorage.removeItem('era_racing_cache');
+        localStorage.removeItem('era_racing_cache_ts');
+        localStorage.setItem('era_racing_last_update', Date.now().toString());
+
+        showMsg('upload-status', 'success',
+          `✅ Berhasil! ${sheets.length} sheet terdeteksi: ${sheets.join(', ')}`);
+
+        dropZone.querySelector('.drop-text').textContent = file.name;
+        dropZone.querySelector('.drop-sub').textContent =
+          `${(file.size / 1024).toFixed(0)} KB · ${sheets.length} sheet`;
+      } catch (err) {
+        showMsg('upload-status', 'error', '⚠️ Gagal membaca file: ' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // ── Settings ───────────────────────────
+  function loadSettings() {
+    document.getElementById('field-anthropic').value = localStorage.getItem('era_anthropic_key') || '';
+    document.getElementById('field-fonnte').value    = localStorage.getItem('era_fonnte_token') || '';
+    document.getElementById('field-wa-target').value = localStorage.getItem('era_fonnte_target') || '';
+  }
+
+  function saveSettings() {
+    const anthropic = document.getElementById('field-anthropic').value.trim();
+    const fonnte    = document.getElementById('field-fonnte').value.trim();
+    const waTarget  = document.getElementById('field-wa-target').value.trim();
+    const newPin    = document.getElementById('field-pin').value.trim();
+
+    if (anthropic) localStorage.setItem('era_anthropic_key', anthropic);
+    if (fonnte)    localStorage.setItem('era_fonnte_token', fonnte);
+    if (waTarget)  localStorage.setItem('era_fonnte_target', waTarget);
+    if (newPin && newPin.length === 4 && /^\d+$/.test(newPin)) {
+      localStorage.setItem(STORED_PIN_KEY, newPin);
+    }
+
+    showMsg('settings-status', 'success', '✅ Pengaturan disimpan');
+  }
+
+  // ── Danger Zone ────────────────────────
+  function clearAllData() {
+    if (!confirm('Hapus semua cache data? Dashboard akan memuat ulang dari file Excel.')) return;
+    ['era_racing_cache','era_racing_cache_ts','era_racing_xlsx','era_racing_last_update']
+      .forEach(k => localStorage.removeItem(k));
+    showMsg('settings-status', 'success', '✅ Cache dihapus. Reload dashboard untuk memuat ulang.');
+  }
+
+  // ── Helper ─────────────────────────────
+  function showMsg(id, type, text) {
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    el.className = 'status-msg ' + type;
+    el.textContent = text;
+  }
+</script>
+</body>
+</html>
