@@ -55,9 +55,7 @@ const DataService = (() => {
       if (!row || !row[storeIdx.siteCode]) break;
 
       let target = 0;
-      if (storeIdx.target1 !== undefined && storeIdx.target2 !== undefined) {
-        target = _parseNum(row[storeIdx.target1]) + _parseNum(row[storeIdx.target2]);
-      } else if (storeIdx.target1 !== undefined) {
+      if (storeIdx.target1 !== undefined) {
         target = _parseNum(row[storeIdx.target1]);
       } else if (storeIdx.target2 !== undefined) {
         target = _parseNum(row[storeIdx.target2]);
