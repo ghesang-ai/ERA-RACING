@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ERA-RACING">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="description" content="ERA-RACING Dashboard Region 5 Erajaya Digital">
+  <title>ERA-RACING</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/table.css">
+  <link rel="stylesheet" href="css/charts.css">
+  <link rel="stylesheet" href="css/mobile.css">
+
+  <!-- Libraries CDN -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-row">
+      <div class="app-logo">
+        <div class="logo-box">ER</div>
+        <div>
+          <div class="app-name">ERA-RACING</div>
+          <div class="app-subtitle" id="header-subtitle">Racing Campaign Monitor · Mei 2026</div>
+        </div>
+      </div>
+      <div class="region-badge">REGION 5</div>
+    </div>
+  </header>
+
+  <!-- Update badge row -->
+  <div class="update-row">
+    <div class="update-badge" id="update-badge">Memuat data...</div>
+  </div>
+
+  <!-- Campaign Pills (shown on Dashboard, Grafik, AI tabs) -->
+  <div class="campaign-tabs" id="campaign-tabs"></div>
+
+  <!-- ── PAGE: DASHBOARD ─────────────────── -->
+  <div id="page-dashboard" class="page active">
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card skeleton" style="height:80px"></div>
+      <div class="kpi-card skeleton" style="height:80px"></div>
+      <div class="kpi-card skeleton" style="height:80px"></div>
+      <div class="kpi-card skeleton" style="height:80px"></div>
+    </div>
+
+    <!-- LOB Summary -->
+    <div class="section-pad" style="padding-bottom:0">
+      <div class="section-title">Performance per LOB</div>
+    </div>
+    <div class="lob-list" id="lob-list"></div>
+
+    <!-- TSH Breakdown -->
+    <div class="section-pad" style="padding-bottom:0">
+      <div class="section-title">TSH Breakdown</div>
+    </div>
+    <div class="tsh-section" id="tsh-section"></div>
+  </div>
+
+  <!-- ── PAGE: GRAFIK ────────────────────── -->
+  <div id="page-charts" class="page">
+    <div class="charts-page">
+      <div class="chart-card">
+        <div class="chart-card-title">MtD vs Target per TSH</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chart-bar"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Distribusi Est% per LOB</div>
+        <div class="chart-wrap" style="height:180px">
+          <canvas id="chart-donut"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Perbandingan Est% Semua Campaign</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chart-line"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAGE: STORE ─────────────────────── -->
+  <div id="page-store" class="page">
+    <div class="store-controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" id="store-search"
+               placeholder="Cari kode atau nama toko..." autocomplete="off">
+      </div>
+      <div class="filter-chips" id="filter-chips">
+        <div class="chip active" data-filter="all">Semua</div>
+        <div class="chip" data-filter="lob">LOB</div>
+        <div class="chip" data-filter="tsh">TSH</div>
+        <div class="chip" data-filter="territory">Territory</div>
+        <div class="chip" data-filter="sort">Sort ↓</div>
+      </div>
+    </div>
+    <div class="store-list" id="store-list"></div>
+  </div>
+
+  <!-- ── PAGE: AI INSIGHT ────────────────── -->
+  <div id="page-ai" class="page">
+    <div class="section-pad">
+      <div style="background:linear-gradient(135deg,#1a2744,var(--bg-primary));border:1px solid rgba(0,212,170,.2);border-radius:var(--radius);padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#00D4AA,#0EA5E9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🤖</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary)">AI Sales Analysis</div>
+          <div style="font-size:10px;color:var(--text-muted)">Claude Sonnet · Region 5</div>
+        </div>
+      </div>
+
+      <div id="ai-api-warning" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;font-size:11px;color:#F59E0B;display:none">
+        ⚠️ API Key belum dikonfigurasi. Buka <a href="admin.html" style="color:var(--accent-primary)">/admin</a> untuk mengatur.
+      </div>
+
+      <button id="ai-generate-btn" style="width:100%;background:linear-gradient(135deg,#00D4AA,#0EA5E9);border:none;border-radius:var(--radius-sm);padding:13px;font-size:13px;font-weight:700;color:var(--bg-primary);cursor:pointer;margin-bottom:16px;font-family:var(--font-main)">
+        ✨ Generate AI Analysis
+      </button>
+
+      <div id="ai-output" style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:12px;color:var(--text-secondary);line-height:1.7;min-height:120px;display:none"></div>
+
+      <button id="wa-share-btn" style="width:100%;background:var(--bg-secondary);border:1px solid #25D366;border-radius:var(--radius-sm);padding:12px;font-size:12px;font-weight:700;color:#25D366;cursor:pointer;margin-top:12px;font-family:var(--font-main);display:none">
+        📱 Share ke WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- Overlay for drawer -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Store Detail Drawer -->
+  <div class="drawer" id="store-drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title" id="drawer-title">—</div>
+    <div class="drawer-sub" id="drawer-sub">—</div>
+    <div class="drawer-body" id="drawer-body"></div>
+  </div>
+
+  <!-- ── BOTTOM NAV ──────────────────────── -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-tab="dashboard">
+      <div class="nav-icon">🏁</div>
+      <div>Dashboard</div>
+    </div>
+    <div class="nav-item" data-tab="charts">
+      <div class="nav-icon">📊</div>
+      <div>Grafik</div>
+    </div>
+    <div class="nav-item" data-tab="store">
+      <div class="nav-icon">🏪</div>
+      <div>Store</div>
+    </div>
+    <div class="nav-item" data-tab="ai">
+      <div class="nav-icon">🤖</div>
+      <div>AI Insight</div>
+    </div>
+  </nav>
+
+</div><!-- #app -->
+
+<!-- JS (load order matters) -->
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/store-table.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/ai-insight.js"></script>
+<script src="js/notif.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
