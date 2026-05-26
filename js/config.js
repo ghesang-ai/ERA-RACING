@@ -1,7 +1,7 @@
 const CONFIG = {
   EXCEL_PATH: 'data/racing.xlsx',
   CACHE_TTL_MS: 15 * 60 * 1000,
-  ADMIN_PIN: '1234',
+  ADMIN_PIN: '1234', // Non-secret: PIN is checked client-side, change via /admin page
 
   CAMPAIGNS: [
     'OPPO CLIMBER',
@@ -47,22 +47,22 @@ function getAchColor(pct) {
 }
 
 function formatRupiah(value) {
-  if (value === null || value === undefined || isNaN(value)) return '—';
+  if (!isFinite(value)) return '—';
   const abs = Math.abs(value);
   const sign = value < 0 ? '-' : '';
   if (abs >= 1e12) return sign + (abs / 1e12).toFixed(2) + 'T';
   if (abs >= 1e9)  return sign + (abs / 1e9).toFixed(1) + 'B';
-  if (abs >= 1e6)  return sign + (abs / 1e6).toFixed(0) + 'jt';
+  if (abs >= 1e6)  return sign + (abs / 1e6).toFixed(1) + 'jt';
   return sign + Math.round(abs).toLocaleString('id-ID');
 }
 
 function formatPct(value) {
-  if (value === null || value === undefined || isNaN(value)) return '—';
+  if (!isFinite(value)) return '—';
   return (value * 100).toFixed(1) + '%';
 }
 
 function formatMoM(value) {
-  if (value === null || value === undefined || isNaN(value)) return '—';
+  if (!isFinite(value)) return '—';
   const sign = value >= 0 ? '+' : '';
   return sign + (value * 100).toFixed(1) + '%';
 }
