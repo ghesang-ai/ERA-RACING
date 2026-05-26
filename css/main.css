@@ -256,5 +256,5 @@ html, body {
 
 .overlay.show {
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto;
 }
