@@ -40,10 +40,10 @@ function getAchClass(pct) {
 }
 
 function getAchColor(pct) {
-  if (pct >= 1.0)  return '#10B981';
-  if (pct >= 0.85) return '#00D4AA';
-  if (pct >= 0.70) return '#F59E0B';
-  return '#EF4444';
+  if (pct >= 1.0)  return '#059669';
+  if (pct >= 0.85) return '#2563EB';
+  if (pct >= 0.70) return '#D97706';
+  return '#DC2626';
 }
 
 function formatRupiah(value) {

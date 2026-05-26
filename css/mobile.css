@@ -37,6 +37,6 @@ html {
 /* PWA status bar */
 @media (display-mode: standalone) {
   .app-header {
-    padding-top: calc(env(safe-area-inset-top) + 14px);
+    padding-top: calc(env(safe-area-inset-top) + 16px);
   }
 }

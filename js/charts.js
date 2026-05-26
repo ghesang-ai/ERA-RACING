@@ -17,7 +17,7 @@ function _destroyChart(ref) {
 const CHART_DEFAULTS = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: { labels: { color: '#94A3B8', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } } } },
+  plugins: { legend: { labels: { color: '#4B6A8F', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } } } },
 };
 
 function _renderBarChart(campaign) {
@@ -35,8 +35,8 @@ function _renderBarChart(campaign) {
     data: {
       labels,
       datasets: [
-        { label: 'MtD',    data: mtdData, backgroundColor: '#00D4AA', borderRadius: 4 },
-        { label: 'Target', data: tgtData, backgroundColor: 'rgba(14,165,233,.3)', borderRadius: 4 },
+        { label: 'MtD',    data: mtdData, backgroundColor: '#2563EB', borderRadius: 4 },
+        { label: 'Target', data: tgtData, backgroundColor: 'rgba(6,182,212,.25)', borderRadius: 4 },
       ],
     },
     options: {
@@ -44,11 +44,11 @@ function _renderBarChart(campaign) {
       indexAxis: 'y',
       scales: {
         x: {
-          ticks: { color: '#64748B', callback: v => formatRupiah(v), font: { size: 9 } },
-          grid:  { color: 'rgba(51,65,85,.5)' },
+          ticks: { color: '#94A3B8', callback: v => formatRupiah(v), font: { size: 9 } },
+          grid:  { color: 'rgba(191,219,254,.6)' },
         },
         y: {
-          ticks: { color: '#94A3B8', font: { size: 9 } },
+          ticks: { color: '#4B6A8F', font: { size: 9 } },
           grid:  { display: false },
         },
       },
@@ -65,7 +65,7 @@ function _renderDonutChart(campaign) {
   const lob = campaign.lobSummary;
   if (!lob || lob.length === 0) return;
 
-  const COLORS = ['#00D4AA', '#0EA5E9', '#F59E0B', '#EF4444', '#10B981', '#8B5CF6'];
+  const COLORS = ['#2563EB', '#06B6D4', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444'];
 
   _chartDonut = new Chart(document.getElementById('chart-donut'), {
     type: 'doughnut',
@@ -98,7 +98,7 @@ function _renderLineChart(allData) {
   });
 
   const COLORS = data.map(v =>
-    v === null ? '#334155' : v >= 100 ? '#10B981' : v >= 85 ? '#00D4AA' : v >= 70 ? '#F59E0B' : '#EF4444'
+    v === null ? '#BFDBFE' : v >= 100 ? '#10B981' : v >= 85 ? '#2563EB' : v >= 70 ? '#F59E0B' : '#EF4444'
   );
 
   _chartLine = new Chart(document.getElementById('chart-line'), {
