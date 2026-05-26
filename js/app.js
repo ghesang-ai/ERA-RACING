@@ -7,6 +7,7 @@ const AppState = {
 };
 
 async function initApp() {
+  if (AppState.loading) return;
   _renderCampaignPills();
   _bindNav();
   _bindOverlay();

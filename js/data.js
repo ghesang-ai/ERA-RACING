@@ -55,9 +55,15 @@ const DataService = (() => {
       if (!row || !row[storeIdx.siteCode]) break;
 
       let target = 0;
-      if (storeIdx.target !== undefined)  target = _parseNum(row[storeIdx.target]);
-      if (storeIdx.target1 !== undefined) target += _parseNum(row[storeIdx.target1]);
-      if (storeIdx.target2 !== undefined) target += _parseNum(row[storeIdx.target2]);
+      if (storeIdx.target1 !== undefined && storeIdx.target2 !== undefined) {
+        target = _parseNum(row[storeIdx.target1]) + _parseNum(row[storeIdx.target2]);
+      } else if (storeIdx.target1 !== undefined) {
+        target = _parseNum(row[storeIdx.target1]);
+      } else if (storeIdx.target2 !== undefined) {
+        target = _parseNum(row[storeIdx.target2]);
+      } else if (storeIdx.target !== undefined) {
+        target = _parseNum(row[storeIdx.target]);
+      }
 
       const mtd    = _parseNum(row[storeIdx.mtd]);
       const est    = _parseNum(row[storeIdx.est]);
@@ -231,6 +237,7 @@ const DataService = (() => {
   function clearCache() {
     localStorage.removeItem('era_racing_cache');
     localStorage.removeItem('era_racing_cache_ts');
+    localStorage.removeItem('era_racing_last_update');
   }
 
   return { loadWorkbook, getCampaign, getLastUpdateText, clearCache };
