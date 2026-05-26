@@ -1,0 +1,206 @@
+/* ── KPI Cards ───────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px 16px;
+}
+
+.kpi-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.kpi-card.card-mtd::before    { background: var(--accent-primary); }
+.kpi-card.card-target::before { background: var(--accent-secondary); }
+.kpi-card.card-pct::before    { background: var(--accent-warning); }
+.kpi-card.card-mom::before    { background: var(--accent-danger); }
+
+.kpi-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.kpi-value.color-green  { color: var(--accent-success); }
+.kpi-value.color-teal   { color: var(--accent-primary); }
+.kpi-value.color-amber  { color: var(--accent-warning); }
+.kpi-value.color-red    { color: var(--accent-danger); }
+.kpi-value.color-blue   { color: var(--accent-secondary); }
+
+.kpi-sub {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── LOB Cards ───────────────────────────── */
+.lob-list { padding: 0 16px 4px; }
+
+.lob-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.lob-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.lob-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.lob-pct {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.lob-meta {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 5px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .5s ease;
+  max-width: 100%;
+}
+
+/* ── TSH Section ─────────────────────────── */
+.tsh-section { padding: 0 16px 8px; }
+
+.tsh-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+.tsh-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  gap: 8px;
+}
+
+.tsh-toggle {
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+
+.tsh-item.open .tsh-toggle { transform: rotate(90deg); }
+
+.tsh-name {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.tsh-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tsh-mtd-text {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ── Store Mini Table (inside TSH) ───────── */
+.tsh-stores {
+  display: none;
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.tsh-item.open .tsh-stores { display: block; }
+
+.store-table-mini {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.store-table-mini thead tr {
+  background: var(--bg-primary);
+}
+
+.store-table-mini th {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.store-table-mini th:last-child { text-align: right; }
+
+.store-table-mini td {
+  font-size: 10px;
+  color: var(--text-secondary);
+  padding: 8px 10px;
+  border-top: 1px solid rgba(51,65,85,.5);
+}
+
+.store-table-mini td:last-child { text-align: right; }
+
+.store-table-mini tr:nth-child(even) td {
+  background: rgba(0,0,0,.15);
+}
+
+.store-code {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-secondary);
+  font-family: monospace;
+}

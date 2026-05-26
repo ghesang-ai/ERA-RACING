@@ -1,0 +1,42 @@
+/* iPhone safe area */
+.bottom-nav {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 4px);
+}
+
+.page {
+  padding-top: 0;
+}
+
+/* Prevent iOS zoom on input focus */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Touch targets minimum 44px */
+.nav-item, .pill, .tsh-header, .store-row, .lob-card,
+.chip, .kpi-card {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Override for small elements in tables */
+.store-table-mini td {
+  min-height: unset;
+}
+
+/* Smooth momentum scroll iOS */
+.campaign-tabs, .filter-chips, .page, .drawer {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent overscroll bounce showing white */
+html {
+  overscroll-behavior: none;
+}
+
+/* PWA status bar */
+@media (display-mode: standalone) {
+  .app-header {
+    padding-top: calc(env(safe-area-inset-top) + 14px);
+  }
+}
