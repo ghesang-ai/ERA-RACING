@@ -62,7 +62,6 @@ function _renderLob(lobSummary) {
     const pct     = lob.estPct;
     const barPct  = Math.min(pct * 100, 100).toFixed(1);
     const color   = getAchColor(pct);
-    const achCls  = getAchClass(pct);
     return `
       <div class="lob-card">
         <div class="lob-header">
@@ -87,7 +86,6 @@ function _renderTsh(tshSummary, stores) {
 
   container.innerHTML = tshSummary.map((tsh, idx) => {
     const pct    = tsh.estPct;
-    const color  = getAchColor(pct);
     const achCls = getAchClass(pct);
     const tshStores = stores.filter(s => s.tsh === tsh.name && s.status === 'Active');
 
