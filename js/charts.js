@@ -94,7 +94,8 @@ function _renderLineChart(allData) {
   const labels = CONFIG.CAMPAIGNS;
   const data   = labels.map(name => {
     const d = allData[name];
-    return d && d.grandTotal ? +(d.grandTotal.estPct * 100).toFixed(1) : null;
+    const pct = d?.grandTotal?.estPct;
+    return (pct !== null && pct !== undefined && isFinite(pct)) ? +(pct * 100).toFixed(1) : null;
   });
 
   const COLORS = data.map(v =>

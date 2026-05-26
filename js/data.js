@@ -19,7 +19,7 @@ const DataService = (() => {
       else if (key.startsWith('target')) idx.target    = i;
       else if (key === 'mtd')           idx.mtd        = i;
       else if (key === 'est' && !key.includes('%')) idx.est = i;
-      else if (key.includes('est') && key.includes('%')) idx.estPct = i;
+      else if (key.includes('est') && key.includes('%') && idx.estPct === undefined) idx.estPct = i;
       else if (key === 'mom')           idx.mom        = i;
     });
     return idx;
@@ -65,9 +65,9 @@ const DataService = (() => {
 
       const mtd    = _parseNum(row[storeIdx.mtd]);
       const est    = _parseNum(row[storeIdx.est]);
-      const estPct = storeIdx.estPct !== undefined
-        ? _parseNum(row[storeIdx.estPct])
-        : (target > 0 ? est / target : 0);
+      const estPct = target === 0 ? NaN
+        : storeIdx.estPct !== undefined ? _parseNum(row[storeIdx.estPct])
+        : storeIdx.est !== undefined ? est / target : NaN;
 
       stores.push({
         siteCode:  String(row[storeIdx.siteCode]  || ''),
@@ -96,10 +96,11 @@ const DataService = (() => {
 
       const lobNameCol  = (lobHeaders.lob  !== undefined ? lobHeaders.lob  : 0) + lhOffset;
       const lobAprilCol = (lobHeaders.april !== undefined ? lobHeaders.april : 1) + lhOffset;
-      const lobTgtCol   = (lobHeaders.target !== undefined ? lobHeaders.target : 2) + lhOffset;
-      const lobMtdCol   = (lobHeaders.mtd   !== undefined ? lobHeaders.mtd   : 3) + lhOffset;
-      const lobEstCol   = (lobHeaders.est   !== undefined ? lobHeaders.est   : 4) + lhOffset;
-      const lobPctCol   = (lobHeaders.estPct !== undefined ? lobHeaders.estPct : 5) + lhOffset;
+      const lobTgtCol   = lobHeaders.target1 !== undefined ? lobHeaders.target1 + lhOffset
+                        : lobHeaders.target  !== undefined ? lobHeaders.target  + lhOffset : -1;
+      const lobMtdCol   = lobHeaders.mtd   !== undefined ? lobHeaders.mtd   + lhOffset : -1;
+      const lobEstCol   = lobHeaders.est   !== undefined ? lobHeaders.est   + lhOffset : -1;
+      const lobPctCol   = lobHeaders.estPct !== undefined ? lobHeaders.estPct + lhOffset : -1;
       const lobMomCol   = lobHeaders.mom !== undefined ? lobHeaders.mom + lhOffset : -1;
 
       let tshHeaderRowIdx = -1;
@@ -118,14 +119,19 @@ const DataService = (() => {
         const entry = {
           name:   nameVal,
           april:  _parseNum(row[lobAprilCol]),
-          target: _parseNum(row[lobTgtCol]),
-          mtd:    _parseNum(row[lobMtdCol]),
-          est:    _parseNum(row[lobEstCol]),
-          estPct: _parseNum(row[lobPctCol]),
+          target: lobTgtCol >= 0 ? _parseNum(row[lobTgtCol]) : 0,
+          mtd:    lobMtdCol >= 0 ? _parseNum(row[lobMtdCol]) : 0,
+          est:    lobEstCol >= 0 ? _parseNum(row[lobEstCol]) : 0,
+          estPct: (() => {
+            const tgt = lobTgtCol >= 0 ? _parseNum(row[lobTgtCol]) : 0;
+            if (tgt === 0) return NaN;
+            if (lobPctCol >= 0) return _parseNum(row[lobPctCol]);
+            return lobEstCol >= 0 ? _parseNum(row[lobEstCol]) / tgt : NaN;
+          })(),
           mom:    lobMomCol >= 0 ? _parseNum(row[lobMomCol]) : null,
         };
 
-        if (nameVal === 'Grand Total') grandTotal = entry;
+        if (nameVal === 'Grand Total' || nameVal === 'Total') grandTotal = entry;
         else lobSummary.push(entry);
       }
 
@@ -136,10 +142,11 @@ const DataService = (() => {
 
         const tshNameCol  = (tshH.tsh !== undefined ? tshH.tsh : 0) + thOff;
         const tshAprilCol = (tshH.april !== undefined ? tshH.april : 1) + thOff;
-        const tshTgtCol   = (tshH.target !== undefined ? tshH.target : 2) + thOff;
-        const tshMtdCol   = (tshH.mtd !== undefined ? tshH.mtd : 3) + thOff;
-        const tshEstCol   = (tshH.est !== undefined ? tshH.est : 4) + thOff;
-        const tshPctCol   = (tshH.estPct !== undefined ? tshH.estPct : 5) + thOff;
+        const tshTgtCol   = tshH.target1 !== undefined ? tshH.target1 + thOff
+                          : tshH.target  !== undefined ? tshH.target  + thOff : -1;
+        const tshMtdCol   = tshH.mtd   !== undefined ? tshH.mtd   + thOff : -1;
+        const tshEstCol   = tshH.est   !== undefined ? tshH.est   + thOff : -1;
+        const tshPctCol   = tshH.estPct !== undefined ? tshH.estPct + thOff : -1;
         const tshMomCol   = tshH.mom !== undefined ? tshH.mom + thOff : -1;
 
         for (let r = tshHeaderRowIdx + 1; r < raw.length; r++) {
@@ -151,10 +158,15 @@ const DataService = (() => {
           tshSummary.push({
             name:   nameVal,
             april:  _parseNum(row[tshAprilCol]),
-            target: _parseNum(row[tshTgtCol]),
-            mtd:    _parseNum(row[tshMtdCol]),
-            est:    _parseNum(row[tshEstCol]),
-            estPct: _parseNum(row[tshPctCol]),
+            target: tshTgtCol >= 0 ? _parseNum(row[tshTgtCol]) : 0,
+            mtd:    tshMtdCol >= 0 ? _parseNum(row[tshMtdCol]) : 0,
+            est:    tshEstCol >= 0 ? _parseNum(row[tshEstCol]) : 0,
+            estPct: (() => {
+              const tgt = tshTgtCol >= 0 ? _parseNum(row[tshTgtCol]) : 0;
+              if (tgt === 0) return NaN;
+              if (tshPctCol >= 0) return _parseNum(row[tshPctCol]);
+              return tshEstCol >= 0 ? _parseNum(row[tshEstCol]) / tgt : NaN;
+            })(),
             mom:    tshMomCol >= 0 ? _parseNum(row[tshMomCol]) : null,
           });
         }

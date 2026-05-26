@@ -32,7 +32,10 @@ const CONFIG = {
   },
 };
 
+function _noData(v) { return v === null || v === undefined || !isFinite(v); }
+
 function getAchClass(pct) {
+  if (_noData(pct)) return '';
   if (pct >= 1.0)  return 'excellent';
   if (pct >= 0.85) return 'good';
   if (pct >= 0.70) return 'warning';
@@ -40,6 +43,7 @@ function getAchClass(pct) {
 }
 
 function getAchColor(pct) {
+  if (_noData(pct)) return '#94A3B8';
   if (pct >= 1.0)  return '#059669';
   if (pct >= 0.85) return '#2563EB';
   if (pct >= 0.70) return '#D97706';
@@ -47,7 +51,7 @@ function getAchColor(pct) {
 }
 
 function formatRupiah(value) {
-  if (!isFinite(value)) return '—';
+  if (_noData(value)) return '—';
   const abs = Math.abs(value);
   const sign = value < 0 ? '-' : '';
   if (abs >= 1e12) return sign + (abs / 1e12).toFixed(2) + 'T';
@@ -57,12 +61,12 @@ function formatRupiah(value) {
 }
 
 function formatPct(value) {
-  if (!isFinite(value)) return '—';
+  if (_noData(value)) return '—';
   return (value * 100).toFixed(1) + '%';
 }
 
 function formatMoM(value) {
-  if (!isFinite(value)) return '—';
+  if (_noData(value)) return '—';
   const sign = value >= 0 ? '+' : '';
   return sign + (value * 100).toFixed(1) + '%';
 }
