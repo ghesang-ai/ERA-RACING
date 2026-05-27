@@ -6,21 +6,23 @@ const DataService = (() => {
     headers.forEach((h, i) => {
       if (h === null || h === undefined) return;
       const key = String(h).trim().toLowerCase();
-      if (key === 'site code')          idx.siteCode   = i;
-      else if (key === 'site desc')     idx.siteDesc   = i;
-      else if (key === 'lob')           idx.lob        = i;
-      else if (key === 'tsh')           idx.tsh        = i;
-      else if (key === 'bu')            idx.bu         = i;
-      else if (key === 'status')        idx.status     = i;
-      else if (key === 'territory')     idx.territory  = i;
-      else if (key === 'april')         idx.april      = i;
-      else if (key === 'target 1')      idx.target1    = i;
-      else if (key === 'target 2')      idx.target2    = i;
-      else if (key.startsWith('target')) idx.target    = i;
-      else if (key === 'mtd')           idx.mtd        = i;
-      else if (key === 'est' && !key.includes('%')) idx.est = i;
+      // Use first-match (idx.X === undefined) for every field so that summary
+      // columns repeated in the same header row don't overwrite store columns.
+      if      (key === 'site code'  && idx.siteCode   === undefined) idx.siteCode   = i;
+      else if (key === 'site desc'  && idx.siteDesc   === undefined) idx.siteDesc   = i;
+      else if (key === 'lob'        && idx.lob        === undefined) idx.lob        = i;
+      else if (key === 'tsh'        && idx.tsh        === undefined) idx.tsh        = i;
+      else if (key === 'bu'         && idx.bu         === undefined) idx.bu         = i;
+      else if (key === 'status'     && idx.status     === undefined) idx.status     = i;
+      else if (key === 'territory'  && idx.territory  === undefined) idx.territory  = i;
+      else if (key === 'april'      && idx.april      === undefined) idx.april      = i;
+      else if (key === 'target 1'   && idx.target1    === undefined) idx.target1    = i;
+      else if (key === 'target 2'   && idx.target2    === undefined) idx.target2    = i;
+      else if (key.startsWith('target') && idx.target === undefined) idx.target     = i;
+      else if (key === 'mtd'        && idx.mtd        === undefined) idx.mtd        = i;
+      else if (key === 'est' && !key.includes('%') && idx.est === undefined) idx.est = i;
       else if (key.includes('est') && key.includes('%') && idx.estPct === undefined) idx.estPct = i;
-      else if (key === 'mom')           idx.mom        = i;
+      else if (key === 'mom'        && idx.mom        === undefined) idx.mom        = i;
     });
     return idx;
   }
