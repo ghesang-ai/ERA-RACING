@@ -12,39 +12,51 @@ function renderDashboard(campaign) {
 }
 
 function _renderKpi(gt, campaign) {
-  const estPct = gt ? gt.estPct : 0;
+  const estPct = gt ? gt.estPct : NaN;
   const mom    = gt ? gt.mom : null;
   const mtd    = gt ? gt.mtd : 0;
   const target = gt ? gt.target : 0;
+  const est    = gt ? gt.est : 0;
 
   const momClass  = (mom !== null && mom >= 0) ? 'color-green' : 'color-red';
   const momSign   = (mom !== null && mom >= 0) ? '+' : '';
+  const dayText   = campaign.totalDays
+    ? `Hari ke-${campaign.currentDay} / ${campaign.totalDays}`
+    : `Hari ke-${campaign.currentDay}`;
+  const subName   = campaign.variant || (campaign.variants ? campaign.variants[0] : '');
+  const month     = formatPeriodMonth(campaign.period);
+
+  const card2 = campaign.hasTarget
+    ? _kpiCard('card-target', `Target ${month}`, 'color-blue', formatRupiah(target), dayText)
+    : _kpiCard('card-target', 'Estimasi', 'color-blue', formatRupiah(est), dayText);
+  const card3 = campaign.hasTarget
+    ? _kpiCard('card-pct', 'Est% vs Target', _pctColorClass(estPct), formatPct(estPct), 'vs Target')
+    : _kpiCard('card-pct', campaign.prevLabel || 'Bulan Lalu', 'color-amber',
+               gt && gt.april !== null ? formatRupiah(gt.april) : '—', 'Bulan Lalu');
+  const card4 = mom !== null
+    ? _kpiCard('card-mom', 'MoM Growth', momClass, momSign + formatPct(mom), 'vs Bulan Lalu')
+    : _kpiCard('card-mom', 'Estimasi', 'color-blue', formatRupiah(est), campaign.period || 'Akhir periode');
 
   document.getElementById('kpi-grid').innerHTML = `
-    <div class="kpi-card card-mtd">
-      <div class="kpi-label">Total MtD</div>
-      <div class="kpi-value color-teal">${formatRupiah(mtd)}</div>
-      <div class="kpi-sub">${campaign.campaign}</div>
-    </div>
-    <div class="kpi-card card-target">
-      <div class="kpi-label">Target ${new Date().toLocaleString('id-ID',{month:'short'})} ${new Date().getFullYear()}</div>
-      <div class="kpi-value color-blue">${formatRupiah(target)}</div>
-      <div class="kpi-sub">Hari ke-${campaign.currentDay} / ${campaign.totalDays}</div>
-    </div>
-    <div class="kpi-card card-pct">
-      <div class="kpi-label">Est% vs Target</div>
-      <div class="kpi-value ${_pctColorClass(estPct)}">${formatPct(estPct)}</div>
-      <div class="kpi-sub">vs Target</div>
-    </div>
-    <div class="kpi-card card-mom">
-      <div class="kpi-label">MoM Growth</div>
-      <div class="kpi-value ${momClass}">${mom !== null ? momSign + formatPct(mom) : '—'}</div>
-      <div class="kpi-sub">vs Bulan Lalu</div>
-    </div>
+    ${_kpiCard('card-mtd', 'Total MtD', 'color-teal', formatRupiah(mtd),
+               campaign.campaign + (subName ? ' · ' + subName : ''))}
+    ${card2}
+    ${card3}
+    ${card4}
   `;
 }
 
+function _kpiCard(cls, label, valueCls, value, sub) {
+  return `
+    <div class="kpi-card ${cls}">
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value ${valueCls}">${value}</div>
+      <div class="kpi-sub">${sub}</div>
+    </div>`;
+}
+
 function _pctColorClass(pct) {
+  if (_noData(pct)) return '';
   if (pct >= 1.0)  return 'color-green';
   if (pct >= 0.85) return 'color-teal';
   if (pct >= 0.70) return 'color-amber';
@@ -60,7 +72,7 @@ function _renderLob(lobSummary) {
 
   container.innerHTML = lobSummary.map(lob => {
     const pct     = lob.estPct;
-    const barPct  = Math.min(pct * 100, 100).toFixed(1);
+    const barPct  = _noData(pct) ? 0 : Math.min(pct * 100, 100).toFixed(1);
     const color   = getAchColor(pct);
     return `
       <div class="lob-card">
@@ -68,7 +80,7 @@ function _renderLob(lobSummary) {
           <div class="lob-name">${lob.name}</div>
           <div class="lob-pct" style="color:${color}">${formatPct(pct)}</div>
         </div>
-        <div class="lob-meta">MtD ${formatRupiah(lob.mtd)} · Target ${formatRupiah(lob.target)}</div>
+        <div class="lob-meta">MtD ${formatRupiah(lob.mtd)} · ${lob.target ? 'Target ' + formatRupiah(lob.target) : 'Est ' + formatRupiah(lob.est)}</div>
         <div class="progress-bar">
           <div class="progress-fill" style="width:${barPct}%;background:${color}"></div>
         </div>

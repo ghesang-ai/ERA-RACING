@@ -62,13 +62,13 @@ function _bindStoreEvents(campaign) {
     _applyAndRender();
   };
 
-  document.getElementById('store-list').addEventListener('click', e => {
+  document.getElementById('store-list').onclick = e => {
     const row = e.target.closest('.store-row');
     if (!row) return;
     const code = row.dataset.code;
     const store = _storeAllData.find(s => s.siteCode === code);
     if (store) _openStoreDrawer(store, campaign);
-  });
+  };
 }
 
 function _applyAndRender() {
@@ -116,12 +116,14 @@ function _openStoreDrawer(store, campaign) {
     ['TSH',      store.tsh],
     ['BU',       store.bu],
     ['Status',   store.status],
-    ['April',    formatRupiah(store.april)],
+    ...(store.april !== null ? [[campaign.prevLabel || 'Bulan Lalu', formatRupiah(store.april)]] : []),
+    ...(campaign.variant || campaign.variants ? [['Varian', campaign.variant || campaign.variants[0]]] : []),
     ['Target',   formatRupiah(store.target)],
     ['MtD',      formatRupiah(store.mtd)],
     ['Estimasi', formatRupiah(store.est)],
     ['Est%',     `<span class="badge ${getAchClass(store.estPct)}">${formatPct(store.estPct)}</span>`],
     ['MoM',      store.mom !== null ? formatMoM(store.mom) : '—'],
+    ...(store.stock !== null ? [['Stock', formatRupiah(store.stock)]] : []),
   ];
 
   document.getElementById('drawer-body').innerHTML = rows.map(([l, v]) => `

@@ -91,7 +91,7 @@ function _renderDonutChart(campaign) {
 function _renderLineChart(allData) {
   _chartLine = _destroyChart(_chartLine);
 
-  const labels = CONFIG.CAMPAIGNS;
+  const labels = Object.keys(allData);
   const data   = labels.map(name => {
     const d = allData[name];
     const pct = d?.grandTotal?.estPct;

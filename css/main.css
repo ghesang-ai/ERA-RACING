@@ -190,6 +190,16 @@ html, body {
 
 .pill-icon { font-size: 12px; }
 
+/* Variant sub-tabs (multi-target campaigns) */
+.variant-tabs {
+  padding: 8px 16px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+.variant-tabs.hidden { display: none !important; }
+.variant-tabs .chip { display: flex; align-items: center; }
+
 /* ── Pages ───────────────────────────────── */
 .page {
   display: none;

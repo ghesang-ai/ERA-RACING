@@ -3,34 +3,40 @@ const CONFIG = {
   CACHE_TTL_MS: 15 * 60 * 1000,
   ADMIN_PIN: '1234', // Non-secret: PIN is checked client-side, change via /admin page
 
-  CAMPAIGNS: [
-    'OPPO CLIMBER',
-    '1 SHIFT 1 STORE',
-    'TELKOMSEL',
-    'INDOSAT',
-    'XL',
-    'RACING VIQOO',
-    'RACING OPPO',
-    'RACING SAMSUNG TABLET',
-    'RACING SAMSUNG A37 - A57',
-    'RACING TECNO CAMON 50 SERIES',
-    'TV',
-  ],
-
+  // Campaign tabs are built from the Excel sheets (any sheet whose row 4 starts
+  // with "Site Code"). Icons below are optional; unknown campaigns get 🏁.
   CAMPAIGN_ICONS: {
     'OPPO CLIMBER': '📱',
     '1 SHIFT 1 STORE': '🏪',
     'TELKOMSEL': '📡',
     'INDOSAT': '🌐',
     'XL': '📶',
+    'TV': '📺',
+    'BOLTECH': '🛡️',
+    'RACING VIVO': '🔵',
+    'SAMSUNG S26 FE': '🌟',
+    'PO REALME 16 HP': '🟡',
+    'HUAWEI MATEPAD': '📟',
+    'RACING SAMSUNG': '📷',
+    'REDMI NOTE 17': '🟠',
     'RACING VIQOO': '🎮',
     'RACING OPPO': '📲',
     'RACING SAMSUNG TABLET': '📟',
     'RACING SAMSUNG A37 - A57': '📷',
     'RACING TECNO CAMON 50 SERIES': '🤳',
-    'TV': '📺',
   },
 };
+
+// "01 - 29 SEPTEMBER 2026" → "Sep 2026"; "September 2026" when long=true.
+function formatPeriodMonth(period, long) {
+  const m = String(period || '').match(/([A-Za-z]+)\s+(\d{4})\s*$/);
+  if (!m) {
+    const d = new Date();
+    return d.toLocaleString('id-ID', { month: long ? 'long' : 'short' }) + ' ' + d.getFullYear();
+  }
+  const name = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
+  return (long ? name : name.slice(0, 3)) + ' ' + m[2];
+}
 
 function _noData(v) { return v === null || v === undefined || !isFinite(v); }
 
